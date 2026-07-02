@@ -13,12 +13,14 @@ private:
     int restaurantId;
     string name;
     string location;
+    float reviews;
     vector<MenuItem> menu;
 
 public:
-    Restaurant(const string& name, const string& location) {
+    Restaurant(const string& name, const string& location,const float& reviews) {
         this->name = name;
         this->location = location;
+        this->reviews =  reviews;
         this->restaurantId = ++nextRestaurantId;
     }
 
@@ -45,6 +47,14 @@ public:
         location = loc;
     }
 
+    void getReviews() const{
+        return reviews;
+    }
+
+    void setReviews(const float& r){
+        reviews = r;
+    }
+    
     void addMenuItem(const MenuItem &item) {
         menu.push_back(item);
     }
