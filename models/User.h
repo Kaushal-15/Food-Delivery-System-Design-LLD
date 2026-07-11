@@ -28,7 +28,7 @@ class User{
         return name;
     }
 
-    string setName(const string& n){
+    void setName(const string& n){
         name =  n ;
     }
     

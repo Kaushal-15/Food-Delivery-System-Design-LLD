@@ -13,12 +13,26 @@ class OrderManager {
         OrderManager (){
 
         }
+
+        ~OrderManager() {
+            for (auto order : orders) {
+                delete order;
+            }
+            orders.clear();
+        }
     public:
         static OrderManager* getInstance(){
             if(!instance){
                 instance =  new OrderManager();
             }
             return instance;
+        }
+
+        static void cleanup() {
+            if (instance) {
+                delete instance;
+                instance = nullptr;
+            }
         }
 
         void addOrder(Order* order){

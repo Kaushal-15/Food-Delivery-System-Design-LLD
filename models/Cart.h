@@ -35,7 +35,7 @@ class Cart {
             return sum;
         }
 
-        bool isempty(){
+        bool isEmpty() const {
             return(!restaurant || items.empty());
         }
 

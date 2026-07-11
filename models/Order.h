@@ -41,7 +41,7 @@ protected:
             paymentStrategy->pay(total);
             return true;
         }else{
-            cout << "Please choose a pyment method to pay!!" << endl;
+            cout << "Please choose a payment method to pay!!" << endl;
             return false;
         }
     }
@@ -95,7 +95,7 @@ const vector<MenuItem>& getItems() const {
         return total;
     }
 
-    void setTotal(int total) {
+    void setTotal(double total) {
         this->total = total;
     }
 };

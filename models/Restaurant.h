@@ -17,7 +17,7 @@ private:
     vector<MenuItem> menu;
 
 public:
-    Restaurant(const string& name, const string& location,const float& reviews) {
+    Restaurant(const string& name, const string& location, float reviews = 0.0f) {
         this->name = name;
         this->location = location;
         this->reviews =  reviews;
@@ -47,7 +47,7 @@ public:
         location = loc;
     }
 
-    void getReviews() const{
+    float getReviews() const {
         return reviews;
     }
 

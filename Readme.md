@@ -24,21 +24,21 @@ The system is organized around a few key responsibilities, each backed by a deli
 |---|---|---|
 | Creating the correct `Order` subtype (new vs. scheduled) | **Factory** | Keeps "which concrete class to build" out of `OrderManager` |
 | Selecting a payment method at runtime (UPI, Card, etc.) | **Strategy** + **Factory** | One interface for all payment types; a factory resolves the runtime choice (e.g. a string from the UI) into the right concrete strategy |
-| Single shared restaurant catalog manager | **Singleton** | One source of truth for restaurant data across the app |
-| Order/payment status updates reaching interested parties (e.g. notifications) | *Planned: Observer* | Decouples the order/payment flow from anything that reacts to it |
+| Single shared restaurant catalog manager | **Singleton** | One source of truth for restaurant data across the app, with custom cleanups |
+| Order/payment status updates reaching interested parties (e.g. notifications) | **Observer** | Decouples the order/payment flow from anything that reacts to it (e.g. `NotificationService` is an `OrderObserver` registered to `ZomatoApp`) |
 
 ### Core Classes
 
 - **`Restaurant`** — id, name, location, menu (`vector<MenuItem>`)
 - **`MenuItem`** — code, name, price
 - **`User`** — id, name, address, owns a `Cart`
-- **`Cart`** — items in progress, total, clear/is-empty checks
+- **`Cart`** — items in progress, total, clear/isEmpty checks
 - **`Order`** *(abstract)* — base for order types, exposes `getType()`
-- **`RestaurantManager`** *(Singleton)* — add restaurants, search by location
-- **`OrderManager`** — orchestrates order creation and lifecycle via `OrderFactory`
-- **`PaymentStrategy`** *(abstract)* — `pay()`, implemented by `UPI`, `CreditCard`, `DebitCard`, `NetBanking`
+- **`RestaurantManager`** *(Singleton)* — add restaurants, search by location, destructor cleanup
+- **`OrderManager`** *(Singleton)* — orchestrates order creation and lifecycle, destructor cleanup
+- **`PaymentStrategy`** *(abstract)* — `pay()`, implemented by `UPI`, `CreditCard`
 - **`PaymentFactory`** — resolves a payment-type string/enum into the correct `PaymentStrategy`
-- **`NotificationService`** — notifies users on order events
+- **`NotificationService`** — implements `OrderObserver` to notify users on order placement events
 
 ### UML Diagram
 
@@ -48,27 +48,27 @@ See [`/docs`](./docs) for the hand-drawn UML diagrams (class relationships, inte
 
 ```
 ZOMATO-CLONE/
-├── factories/        # OrderFactory, PaymentFactory
-├── managers/          # RestaurantManager, OrderManager
-├── models/            # Restaurant, MenuItem, User, Cart, Order
-├── services/          # NotificationService
-├── strategies/        # PaymentStrategy and its implementations
-├── utils/
+├── factories/        # OrderFactory, NowOrderFactory, ScheduledOrderFactory, PaymentFactory
+├── managers/         # RestaurantManager, OrderManager
+├── models/           # Restaurant, MenuItem, User, Cart, Order, DeliveryOrder, PickupOrder
+├── services/         # OrderObserver, NotificationService
+├── strategies/       # PaymentStrategy, UpiPaymentStrategy, CreditCardPaymentStrategy
+├── utils/            # TimeUtils
 ├── main.cpp
-└── TomatoApp.h
+└── ZomatoApp.h
 ```
 
 ## Status
 
-🚧 **Work in progress.** Currently implemented:
+✅ **Fully Implemented and Verified.**
 - [x] `Restaurant`, `MenuItem` models
-- [x] `RestaurantManager` (Singleton) — add + search by location
-- [ ] `Cart` — in progress
-- [ ] `User` — basic structure in place
-- [ ] `Order` hierarchy + `OrderFactory`
-- [ ] `PaymentStrategy` hierarchy + `PaymentFactory`
-- [ ] `NotificationService`
-- [ ] Observer-based decoupling for notifications
+- [x] `RestaurantManager` (Singleton) — add, search, and dynamic cleanup
+- [x] `Cart` — fully implemented, supporting adding items, total cost calculation, and clearing
+- [x] `User` — profiles with address and cart bindings
+- [x] `Order` hierarchy (`DeliveryOrder` and `PickupOrder`) + polymorphic checkout factories (`NowOrderFactory`, `ScheduledOrderFactory`)
+- [x] `PaymentStrategy` hierarchy (`UpiPaymentStrategy`, `CreditCardPaymentStrategy`) + dynamic `PaymentFactory` resolver
+- [x] `NotificationService` decoupled using the **Observer Pattern** (`OrderObserver` interface) for event notification
+- [x] Leak-free memory management with explicit destructor cleanups of singletons, observers, and strategies
 
 ## Build
 

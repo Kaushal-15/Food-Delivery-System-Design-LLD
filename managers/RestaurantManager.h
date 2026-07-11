@@ -16,6 +16,13 @@ private:
 
     }
 
+    ~RestaurantManager() {
+        for (auto r : restaurants) {
+            delete r;
+        }
+        restaurants.clear();
+    }
+
 public:
     static RestaurantManager* getInstance(){
         if(!instance){
@@ -23,6 +30,14 @@ public:
         }
         return instance;
     }
+
+    static void cleanup() {
+        if (instance) {
+            delete instance;
+            instance = nullptr;
+        }
+    }
+
     void addRestaurant(Restaurant* r){
         restaurants.push_back(r);
     }
@@ -31,7 +46,7 @@ public:
         transform(loc.begin(), loc.end(), loc.begin(), ::tolower);
         for(auto r : restaurants){
             string rl = r->getLocation();
-            transform(rl.begin(),rl.end(),rl.begin(), ::towlower);
+            transform(rl.begin(),rl.end(),rl.begin(), ::tolower);
             if(rl == loc ){
                 result.push_back(r);
             }
